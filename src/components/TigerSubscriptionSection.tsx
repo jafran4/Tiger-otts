@@ -14,7 +14,10 @@ import {
   Clock,
   CheckCircle2,
   Lock,
-  Headphones
+  Headphones,
+  ChevronDown,
+  ChevronUp,
+  Plus
 } from "lucide-react";
 import { OTTPlan, OTTService } from "../types";
 
@@ -127,6 +130,7 @@ const TigerSubscriptionSection: React.FC<TigerSubscriptionSectionProps> = ({
 }) => {
   const [selectedPlanId, setSelectedPlanId] = useState<string>("tiger-6m");
   const [currencyMode, setCurrencyMode] = useState<"USD" | "QAR">("USD");
+  const [showAllPlans, setShowAllPlans] = useState<boolean>(false);
 
   const plans = [
     {
@@ -332,132 +336,163 @@ const TigerSubscriptionSection: React.FC<TigerSubscriptionSectionProps> = ({
           </div>
         </div>
 
-        {/* 6 Subscription Cards Grid (2 per row on mobile, 3 per row on tablet/desktop) */}
-        <div className="relative z-10 grid grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3 md:gap-4 lg:gap-4.5 items-stretch">
-          {plans.map((plan) => {
-            const isSelected = selectedPlanId === plan.id;
-            const primaryPriceDisplay =
-              currencyMode === "USD" ? `$${plan.usdPrice.toFixed(2)}` : `${plan.qarPrice} QAR`;
-            const primaryOriginalDisplay =
-              currencyMode === "USD" ? `$${plan.originalUsd.toFixed(2)}` : `${plan.originalQar} QAR`;
-            const secondaryEquivalent =
-              currencyMode === "USD"
-                ? `≈ ${plan.qarPrice} QAR`
-                : `≈ $${plan.usdPrice.toFixed(2)}`;
-            const monthlyDisplay =
-              currencyMode === "USD" ? plan.monthlyUsd : plan.monthlyQar;
+        {/* Subscription Cards Grid (Shows 3 plans initially, expandable to 6 plans) */}
+        {(() => {
+          const displayedPlans = showAllPlans ? plans : plans.slice(0, 3);
+          return (
+            <>
+              <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 sm:gap-3 md:gap-4 lg:gap-4.5 items-stretch transition-all duration-300">
+                {displayedPlans.map((plan) => {
+                  const isSelected = selectedPlanId === plan.id;
+                  const primaryPriceDisplay =
+                    currencyMode === "USD" ? `$${plan.usdPrice.toFixed(2)}` : `${plan.qarPrice} QAR`;
+                  const primaryOriginalDisplay =
+                    currencyMode === "USD" ? `$${plan.originalUsd.toFixed(2)}` : `${plan.originalQar} QAR`;
+                  const secondaryEquivalent =
+                    currencyMode === "USD"
+                      ? `≈ ${plan.qarPrice} QAR`
+                      : `≈ $${plan.usdPrice.toFixed(2)}`;
+                  const monthlyDisplay =
+                    currencyMode === "USD" ? plan.monthlyUsd : plan.monthlyQar;
 
-            return (
-              <div
-                key={plan.id}
-                onClick={() => setSelectedPlanId(plan.id)}
-                className={`relative rounded-lg sm:rounded-xl flex flex-col justify-between p-2.5 sm:p-3.5 md:p-4.5 transition-all duration-200 cursor-pointer ${
-                  plan.popular
-                    ? "bg-gradient-to-b from-[#240c0e] via-[#160d0f] to-[#101010] border-2 border-red-500/90 shadow-[0_0_20px_rgba(229,9,20,0.25)] md:-translate-y-0.5"
-                    : plan.isBestValue
-                    ? "bg-gradient-to-b from-[#1f1407] via-[#14100c] to-[#101010] border-2 border-amber-500/70 shadow-[0_0_18px_rgba(245,158,11,0.18)]"
-                    : plan.isUltimate
-                    ? "bg-gradient-to-b from-[#1a1205] via-[#120f0a] to-[#101010] border-2 border-amber-400/60 shadow-[0_0_18px_rgba(251,191,36,0.15)]"
-                    : plan.isHotDeal
-                    ? "bg-gradient-to-b from-[#1c0e18] via-[#130d12] to-[#101010] border border-fuchsia-600/50 hover:border-fuchsia-500"
-                    : "bg-[#161616]/90 border border-neutral-800 hover:border-neutral-700"
-                }`}
-              >
-                {/* Top Badge */}
-                {plan.popular ? (
-                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-red-600 to-[#E50914] text-white text-[8px] sm:text-[10px] font-black uppercase tracking-wider px-2 sm:px-3 py-0.5 rounded-full shadow-md flex items-center space-x-1 whitespace-nowrap">
-                    <Flame className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-white" />
-                    <span>Most Popular</span>
-                  </div>
-                ) : plan.isBestValue ? (
-                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-amber-600 text-black text-[8px] sm:text-[10px] font-black uppercase tracking-wider px-2 sm:px-3 py-0.5 rounded-full shadow-md flex items-center space-x-1 whitespace-nowrap">
-                    <Crown className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-black" />
-                    <span>Best Value</span>
-                  </div>
-                ) : plan.isUltimate ? (
-                  <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 text-black text-[8px] sm:text-[10px] font-black uppercase tracking-wider px-2 sm:px-3 py-0.5 rounded-full shadow-md flex items-center space-x-1 whitespace-nowrap">
-                    <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-black" />
-                    <span>Lowest Rate</span>
-                  </div>
-                ) : null}
+                  return (
+                    <div
+                      key={plan.id}
+                      onClick={() => setSelectedPlanId(plan.id)}
+                      className={`relative rounded-lg sm:rounded-xl flex flex-col justify-between p-2.5 sm:p-3.5 md:p-4.5 transition-all duration-200 cursor-pointer ${
+                        plan.popular
+                          ? "bg-gradient-to-b from-[#240c0e] via-[#160d0f] to-[#101010] border-2 border-red-500/90 shadow-[0_0_20px_rgba(229,9,20,0.25)] md:-translate-y-0.5"
+                          : plan.isBestValue
+                          ? "bg-gradient-to-b from-[#1f1407] via-[#14100c] to-[#101010] border-2 border-amber-500/70 shadow-[0_0_18px_rgba(245,158,11,0.18)]"
+                          : plan.isUltimate
+                          ? "bg-gradient-to-b from-[#1a1205] via-[#120f0a] to-[#101010] border-2 border-amber-400/60 shadow-[0_0_18px_rgba(251,191,36,0.15)]"
+                          : plan.isHotDeal
+                          ? "bg-gradient-to-b from-[#1c0e18] via-[#130d12] to-[#101010] border border-fuchsia-600/50 hover:border-fuchsia-500"
+                          : "bg-[#161616]/90 border border-neutral-800 hover:border-neutral-700"
+                      }`}
+                    >
+                      {/* Top Badge */}
+                      {plan.popular ? (
+                        <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-red-600 to-[#E50914] text-white text-[8px] sm:text-[10px] font-black uppercase tracking-wider px-2 sm:px-3 py-0.5 rounded-full shadow-md flex items-center space-x-1 whitespace-nowrap">
+                          <Flame className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-white" />
+                          <span>Most Popular</span>
+                        </div>
+                      ) : plan.isBestValue ? (
+                        <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-amber-600 text-black text-[8px] sm:text-[10px] font-black uppercase tracking-wider px-2 sm:px-3 py-0.5 rounded-full shadow-md flex items-center space-x-1 whitespace-nowrap">
+                          <Crown className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-black" />
+                          <span>Best Value</span>
+                        </div>
+                      ) : plan.isUltimate ? (
+                        <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-400 via-amber-300 to-amber-500 text-black text-[8px] sm:text-[10px] font-black uppercase tracking-wider px-2 sm:px-3 py-0.5 rounded-full shadow-md flex items-center space-x-1 whitespace-nowrap">
+                          <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-black" />
+                          <span>Lowest Rate</span>
+                        </div>
+                      ) : null}
 
-                <div>
-                  <div className="flex items-center justify-between mb-1 pt-0.5">
-                    <span className="text-[9px] sm:text-[11px] font-semibold text-neutral-400 truncate max-w-[55%]">
-                      {plan.tag}
-                    </span>
-                    <span className="px-1.5 sm:px-2 py-0.5 rounded-full text-[8px] sm:text-[10px] font-black bg-red-950/70 text-red-400 border border-red-800/40 whitespace-nowrap">
-                      {plan.saveBadge}
-                    </span>
-                  </div>
+                      <div>
+                        <div className="flex items-center justify-between mb-1 pt-0.5">
+                          <span className="text-[9px] sm:text-[11px] font-semibold text-neutral-400 truncate max-w-[55%]">
+                            {plan.tag}
+                          </span>
+                          <span className="px-1.5 sm:px-2 py-0.5 rounded-full text-[8px] sm:text-[10px] font-black bg-red-950/70 text-red-400 border border-red-800/40 whitespace-nowrap">
+                            {plan.saveBadge}
+                          </span>
+                        </div>
 
-                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1 truncate">
-                    {plan.title}
-                  </h3>
+                        <h3 className="text-sm sm:text-base md:text-lg font-bold text-white mb-1 truncate">
+                          {plan.title}
+                        </h3>
 
-                  {/* Main Price (USD by default) */}
-                  <div className="flex items-baseline space-x-1.5 mb-0.5">
-                    <span className="text-lg sm:text-2xl md:text-3xl font-black text-white tracking-tight">
-                      {primaryPriceDisplay}
-                    </span>
-                    <span className="text-[10px] sm:text-xs text-neutral-500 line-through">
-                      {primaryOriginalDisplay}
-                    </span>
-                  </div>
+                        {/* Main Price (USD by default) */}
+                        <div className="flex items-baseline space-x-1.5 mb-0.5">
+                          <span className="text-lg sm:text-2xl md:text-3xl font-black text-white tracking-tight">
+                            {primaryPriceDisplay}
+                          </span>
+                          <span className="text-[10px] sm:text-xs text-neutral-500 line-through">
+                            {primaryOriginalDisplay}
+                          </span>
+                        </div>
 
-                  {/* Dual Currency Conversion Sub-label (1 USD = 3.64 QAR) */}
-                  <div className="flex flex-wrap items-center justify-between gap-1 text-[9px] sm:text-[11px] mb-1.5">
-                    <span className="text-amber-400 font-medium whitespace-nowrap">
-                      {monthlyDisplay}
-                    </span>
-                    <span className="text-neutral-300 font-mono text-[8px] sm:text-[10px] bg-white/5 px-1 py-0.5 rounded border border-white/10 whitespace-nowrap">
-                      {secondaryEquivalent}
-                    </span>
-                  </div>
+                        {/* Dual Currency Conversion Sub-label (1 USD = 3.64 QAR) */}
+                        <div className="flex flex-wrap items-center justify-between gap-1 text-[9px] sm:text-[11px] mb-1.5">
+                          <span className="text-amber-400 font-medium whitespace-nowrap">
+                            {monthlyDisplay}
+                          </span>
+                          <span className="text-neutral-300 font-mono text-[8px] sm:text-[10px] bg-white/5 px-1 py-0.5 rounded border border-white/10 whitespace-nowrap">
+                            {secondaryEquivalent}
+                          </span>
+                        </div>
 
-                  <div className="w-full h-px bg-neutral-800/80 my-1.5" />
+                        <div className="w-full h-px bg-neutral-800/80 my-1.5" />
 
-                  {/* Feature Checklist */}
-                  <ul className="space-y-1 sm:space-y-1.5 text-[10px] sm:text-xs text-neutral-300 mb-2.5 sm:mb-3.5">
-                    {plan.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start space-x-1 sm:space-x-1.5">
-                        <CheckCircle2
-                          className={`w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0 mt-0.5 ${
-                            plan.popular
-                              ? "text-red-400"
-                              : plan.isBestValue || plan.isUltimate
-                              ? "text-amber-400"
-                              : "text-emerald-400"
-                          }`}
-                        />
-                        <span className="leading-tight text-[10px] sm:text-xs line-clamp-2">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                        {/* Feature Checklist */}
+                        <ul className="space-y-1 sm:space-y-1.5 text-[10px] sm:text-xs text-neutral-300 mb-2.5 sm:mb-3.5">
+                          {plan.features.map((feature, idx) => (
+                            <li key={idx} className="flex items-start space-x-1 sm:space-x-1.5">
+                              <CheckCircle2
+                                className={`w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0 mt-0.5 ${
+                                  plan.popular
+                                    ? "text-red-400"
+                                    : plan.isBestValue || plan.isUltimate
+                                    ? "text-amber-400"
+                                    : "text-emerald-400"
+                                }`}
+                              />
+                              <span className="leading-tight text-[10px] sm:text-xs line-clamp-2">{feature}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
 
-                {/* Subscribe Button */}
+                      {/* Subscribe Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onSelectPlan(plan.planData, TIGER_OTT_SERVICE);
+                        }}
+                        className={`w-full py-2 sm:py-2.5 px-2 sm:px-3 rounded-lg font-bold text-[11px] sm:text-xs tracking-wide transition-all duration-200 flex items-center justify-center space-x-1 cursor-pointer shadow-md min-h-[36px] sm:min-h-[42px] ${
+                          plan.popular
+                            ? "bg-[#E50914] hover:bg-red-700 text-white shadow-red-950/50"
+                            : plan.isBestValue || plan.isUltimate
+                            ? "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-black font-extrabold"
+                            : "bg-white hover:bg-neutral-200 text-black"
+                        }`}
+                      >
+                        <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
+                        <span className="truncate">Get {plan.durationLabel}</span>
+                        <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 hidden sm:inline-block" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* More / Less Option Toggle Button */}
+              <div className="relative z-10 mt-4 sm:mt-5 flex justify-center">
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onSelectPlan(plan.planData, TIGER_OTT_SERVICE);
-                  }}
-                  className={`w-full py-2 sm:py-2.5 px-2 sm:px-3 rounded-lg font-bold text-[11px] sm:text-xs tracking-wide transition-all duration-200 flex items-center justify-center space-x-1 cursor-pointer shadow-md min-h-[36px] sm:min-h-[42px] ${
-                    plan.popular
-                      ? "bg-[#E50914] hover:bg-red-700 text-white shadow-red-950/50"
-                      : plan.isBestValue || plan.isUltimate
-                      ? "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 text-black font-extrabold"
-                      : "bg-white hover:bg-neutral-200 text-black"
-                  }`}
+                  id="more-subscriptions-toggle-btn"
+                  data-tv-focusable="true"
+                  onClick={() => setShowAllPlans((prev) => !prev)}
+                  className="inline-flex items-center space-x-2 px-5 sm:px-7 py-2.5 sm:py-3 rounded-full bg-gradient-to-r from-neutral-900 via-[#1c1113] to-neutral-900 hover:from-neutral-800 hover:to-neutral-800 border-2 border-amber-500/50 hover:border-amber-400 text-amber-300 hover:text-white font-extrabold text-xs sm:text-sm tracking-wide shadow-[0_4px_20px_rgba(245,158,11,0.18)] transition-all duration-200 cursor-pointer focus:ring-4 focus:ring-amber-400 focus:scale-105 outline-none group"
+                  aria-expanded={showAllPlans}
                 >
-                  <Zap className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-current" />
-                  <span className="truncate">Get {plan.durationLabel}</span>
-                  <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 hidden sm:inline-block" />
+                  {showAllPlans ? (
+                    <>
+                      <span>Show Less (First 3 Plans)</span>
+                      <ChevronUp className="w-4 h-4 text-amber-400 group-hover:-translate-y-0.5 transition-transform" />
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4 text-amber-400 fill-amber-400" />
+                      <span>More Subscription Options (View All 6 Plans)</span>
+                      <ChevronDown className="w-4 h-4 text-amber-400 group-hover:translate-y-0.5 transition-transform" />
+                    </>
+                  )}
                 </button>
               </div>
-            );
-          })}
-        </div>
+            </>
+          );
+        })()}
 
         {/* Footer info bar */}
         <div className="relative z-10 mt-4 sm:mt-5 pt-3 border-t border-neutral-800/60 flex flex-wrap items-center justify-between gap-2 text-[11px] text-neutral-400">
