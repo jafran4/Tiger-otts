@@ -268,22 +268,19 @@ const NetflixHero: React.FC<NetflixHeroProps> = ({
           data-tv-focusable="true"
           tabIndex={0}
           onClick={handleToggleSound}
-          className={`p-2.5 sm:p-3 rounded-full border-2 transition-all duration-200 cursor-pointer focus:ring-4 focus:ring-amber-400 focus:scale-110 outline-none flex items-center space-x-1.5 backdrop-blur-md shadow-lg ${
+          className={`p-2.5 sm:p-3 rounded-full border-2 transition-all duration-200 cursor-pointer focus:ring-4 focus:ring-amber-400 focus:scale-110 outline-none flex items-center justify-center backdrop-blur-md shadow-lg ${
             !isMuted
               ? "border-emerald-400/80 bg-black/75 text-emerald-400 hover:border-emerald-300"
               : "border-white/40 bg-black/60 text-white/80 hover:border-white hover:text-white"
           }`}
-          title={isMuted ? "Click to Turn Sound ON (Always Sound)" : "Sound is ON (Click to Mute)"}
+          title={isMuted ? "Turn Sound ON" : "Mute Sound"}
           aria-label={isMuted ? "Turn Sound ON" : "Mute Sound"}
         >
           {!isMuted ? (
-            <Volume2 className="w-5 h-5 text-[#46d369] animate-pulse" />
+            <Volume2 className="w-5 h-5 text-[#46d369]" />
           ) : (
-            <VolumeX className="w-5 h-5 text-red-400" />
+            <VolumeX className="w-5 h-5 text-neutral-300" />
           )}
-          <span className="text-xs font-black tracking-wide hidden sm:inline-block">
-            {!isMuted ? "SOUND ON 🔊" : "SOUND OFF"}
-          </span>
         </button>
 
         <div className="bg-black/60 border-l-4 border-[#E50914] py-1.5 px-3.5 sm:px-4 text-xs sm:text-sm font-black text-neutral-200 backdrop-blur-xs">
