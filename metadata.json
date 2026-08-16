@@ -1,0 +1,6 @@
+{
+  "name": "Tiger OTT",
+  "description": "Tiger OTT - Premium streaming discovery platform featuring a cinematic home screen with billboard hero, Top 10 rankings, personalized watchlist, and high-definition video previews.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

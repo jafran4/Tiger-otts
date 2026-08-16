@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tiger OTT - Stream Movies & TV Shows</title>
+    <script>
+      /* Ensure window.fetch is safely assignable and extension errors (e.g. MetaMask / web3) are isolated */
+      (function() {
+        try {
+          var nativeFetch = window.fetch;
+          var _currentFetch = nativeFetch;
+          Object.defineProperty(window, 'fetch', {
+            get: function() { return _currentFetch; },
+            set: function(fn) { _currentFetch = fn; },
+            configurable: true,
+            enumerable: true
+          });
+        } catch (e) {}
+
+        window.addEventListener('unhandledrejection', function(event) {
+          var reasonStr = String(event.reason || '');
+          var messageStr = String(event.reason && event.reason.message ? event.reason.message : '');
+          if (
+            reasonStr.indexOf('MetaMask') !== -1 ||
+            messageStr.indexOf('MetaMask') !== -1 ||
+            reasonStr.indexOf('ethereum') !== -1 ||
+            messageStr.indexOf('Cannot set property fetch') !== -1 ||
+            reasonStr.indexOf('Cannot set property fetch') !== -1
+          ) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          }
+        });
+
+        window.addEventListener('error', function(event) {
+          var msg = String(event.message || '');
+          if (
+            msg.indexOf('Cannot set property fetch') !== -1 ||
+            msg.indexOf('MetaMask') !== -1 ||
+            msg.indexOf('ethereum') !== -1
+          ) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+          }
+        });
+      })();
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&display=swap" rel="stylesheet">
+    <meta name="description" content="MovieManiac - Discover popular, top rated, and upcoming blockbuster movies with real-time ratings, filters, and dark mode." />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
