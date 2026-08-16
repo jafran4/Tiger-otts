@@ -23,11 +23,64 @@ const NetflixDetailModal: React.FC<NetflixDetailModalProps> = ({
   onOpenStore,
 }) => {
   const [trailerKey, setTrailerKey] = useState<string | null>(null);
-  const [isMuted, setIsMuted] = useState(true);
+  const [isMuted, setIsMuted] = useState<boolean>(() => {
+    try {
+      const pref = localStorage.getItem("netflix_sound_preference");
+      return pref === "muted"; // Default is unmuted (Sound Always ON)
+    } catch {
+      return false;
+    }
+  });
   const [credits, setCredits] = useState<{ cast: string[]; director?: string }>({ cast: [] });
   const [similar, setSimilar] = useState<MediaItem[]>([]);
   const [isLiked, setIsLiked] = useState(false);
   const watchBtnRef = useRef<HTMLButtonElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+
+  const sendIframeCommand = (func: string, args: any = "") => {
+    try {
+      if (iframeRef.current && iframeRef.current.contentWindow) {
+        iframeRef.current.contentWindow.postMessage(
+          JSON.stringify({ event: "command", func, args }),
+          "*"
+        );
+      }
+    } catch {}
+  };
+
+  const handleToggleSound = () => {
+    const nextMuted = !isMuted;
+    setIsMuted(nextMuted);
+    try {
+      localStorage.setItem("netflix_sound_preference", nextMuted ? "muted" : "unmuted");
+      window.dispatchEvent(
+        new CustomEvent("netflix_sound_change", { detail: { isMuted: nextMuted } })
+      );
+    } catch {}
+
+    if (nextMuted) {
+      sendIframeCommand("mute");
+    } else {
+      sendIframeCommand("unMute");
+      sendIframeCommand("setVolume", [100]);
+    }
+  };
+
+  useEffect(() => {
+    const handleSoundPref = (e: any) => {
+      const muted =
+        e.detail?.isMuted ?? (localStorage.getItem("netflix_sound_preference") === "muted");
+      setIsMuted(muted);
+      if (muted) {
+        sendIframeCommand("mute");
+      } else {
+        sendIframeCommand("unMute");
+        sendIframeCommand("setVolume", [100]);
+      }
+    };
+    window.addEventListener("netflix_sound_change", handleSoundPref);
+    return () => window.removeEventListener("netflix_sound_change", handleSoundPref);
+  }, []);
 
   useEffect(() => {
     if (!media) return;
@@ -113,12 +166,23 @@ const NetflixDetailModal: React.FC<NetflixDetailModalProps> = ({
         <div className="relative w-full aspect-video sm:h-[420px] md:h-[480px] bg-black overflow-hidden">
           {trailerKey ? (
             <iframe
-              src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&mute=${
+              ref={iframeRef}
+              src={`https://www.youtube-nocookie.com/embed/${trailerKey}?autoplay=1&mute=${
                 isMuted ? 1 : 0
-              }&controls=0&loop=1&playlist=${trailerKey}&showinfo=0&rel=0&modestbranding=1&enablejsapi=1`}
+              }&controls=0&loop=1&playlist=${trailerKey}&showinfo=0&rel=0&modestbranding=1&enablejsapi=1&iv_load_policy=3&disablekb=1&origin=${
+                typeof window !== "undefined" ? encodeURIComponent(window.location.origin) : ""
+              }`}
               title="Movie preview"
               className="w-full h-full object-cover scale-110 pointer-events-none"
-              allow="autoplay; encrypted-media"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+              onLoad={() => {
+                if (!isMuted) {
+                  setTimeout(() => {
+                    sendIframeCommand("unMute");
+                    sendIframeCommand("setVolume", [100]);
+                  }, 500);
+                }
+              }}
             />
           ) : (
             <img
@@ -179,15 +243,24 @@ const NetflixDetailModal: React.FC<NetflixDetailModalProps> = ({
                 <ThumbsUp className="w-5 h-5" />
               </button>
 
-              {/* Mute/Unmute toggle */}
+              {/* Mute/Unmute Sound Always ON toggle */}
               <button
                 data-tv-focusable="true"
                 tabIndex={0}
-                onClick={() => setIsMuted(!isMuted)}
-                className="p-3 rounded-full border-2 border-neutral-400 hover:border-white text-white hover:bg-white/10 transition cursor-pointer focus:ring-4 focus:ring-amber-400 focus:scale-110 outline-none"
-                title={isMuted ? "Unmute preview" : "Mute preview"}
+                onClick={handleToggleSound}
+                className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-full border-2 transition cursor-pointer focus:ring-4 focus:ring-amber-400 focus:scale-110 outline-none backdrop-blur-sm ${
+                  !isMuted
+                    ? "border-[#46d369] bg-[#46d369]/20 text-[#46d369]"
+                    : "border-neutral-400 hover:border-white text-white hover:bg-white/10"
+                }`}
+                title={isMuted ? "Turn Sound ON (Always Sound)" : "Sound is ON (Click to Mute)"}
               >
-                {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                {!isMuted ? (
+                  <Volume2 className="w-5 h-5 animate-pulse" />
+                ) : (
+                  <VolumeX className="w-5 h-5 text-red-400" />
+                )}
+                <span className="text-xs font-black">{!isMuted ? "Sound: ON 🔊" : "Unmute"}</span>
               </button>
             </div>
           </div>

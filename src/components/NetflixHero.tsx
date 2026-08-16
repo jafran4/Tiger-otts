@@ -23,7 +23,61 @@ const NetflixHero: React.FC<NetflixHeroProps> = ({
   const [trailerKey, setTrailerKey] = useState<string | null>(media?.trailerKey || "Way9Dexny3w");
   const [showVideo, setShowVideo] = useState(true);
   const [videoLoaded, setVideoLoaded] = useState(false);
+  const [isMuted, setIsMuted] = useState<boolean>(() => {
+    try {
+      const pref = localStorage.getItem("netflix_sound_preference");
+      return pref === "muted"; // Default is unmuted (Sound Always ON)
+    } catch {
+      return false;
+    }
+  });
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
+
+  const sendIframeCommand = (func: string, args: any = "") => {
+    try {
+      if (iframeRef.current && iframeRef.current.contentWindow) {
+        iframeRef.current.contentWindow.postMessage(
+          JSON.stringify({ event: "command", func, args }),
+          "*"
+        );
+      }
+    } catch {}
+  };
+
+  const handleToggleSound = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    const nextMuted = !isMuted;
+    setIsMuted(nextMuted);
+    try {
+      localStorage.setItem("netflix_sound_preference", nextMuted ? "muted" : "unmuted");
+      window.dispatchEvent(
+        new CustomEvent("netflix_sound_change", { detail: { isMuted: nextMuted } })
+      );
+    } catch {}
+
+    if (nextMuted) {
+      sendIframeCommand("mute");
+    } else {
+      sendIframeCommand("unMute");
+      sendIframeCommand("setVolume", [100]);
+    }
+  };
+
+  useEffect(() => {
+    const handleSoundPref = (e: any) => {
+      const muted =
+        e.detail?.isMuted ?? (localStorage.getItem("netflix_sound_preference") === "muted");
+      setIsMuted(muted);
+      if (muted) {
+        sendIframeCommand("mute");
+      } else {
+        sendIframeCommand("unMute");
+        sendIframeCommand("setVolume", [100]);
+      }
+    };
+    window.addEventListener("netflix_sound_change", handleSoundPref);
+    return () => window.removeEventListener("netflix_sound_change", handleSoundPref);
+  }, []);
 
   useEffect(() => {
     if (!media) return;
@@ -45,6 +99,16 @@ const NetflixHero: React.FC<NetflixHeroProps> = ({
     };
     loadTrailer();
   }, [media]);
+
+  const handleIframeLoad = () => {
+    setVideoLoaded(true);
+    if (!isMuted) {
+      setTimeout(() => {
+        sendIframeCommand("unMute");
+        sendIframeCommand("setVolume", [100]);
+      }, 500);
+    }
+  };
 
   if (!media) return null;
 
@@ -80,7 +144,9 @@ const NetflixHero: React.FC<NetflixHeroProps> = ({
             <div className="relative w-full h-full scale-[1.3] sm:scale-125 md:scale-125 lg:scale-115 flex items-center justify-center pointer-events-none">
               <iframe
                 ref={iframeRef}
-                src={`https://www.youtube-nocookie.com/embed/${trailerKey}?autoplay=1&mute=1&playsinline=1&controls=0&loop=1&playlist=${trailerKey}&showinfo=0&rel=0&modestbranding=1&enablejsapi=1&iv_load_policy=3&disablekb=1&widget_referrer=${
+                src={`https://www.youtube-nocookie.com/embed/${trailerKey}?autoplay=1&mute=${
+                  isMuted ? 1 : 0
+                }&playsinline=1&controls=0&loop=1&playlist=${trailerKey}&showinfo=0&rel=0&modestbranding=1&enablejsapi=1&iv_load_policy=3&disablekb=1&widget_referrer=${
                   typeof window !== "undefined" ? encodeURIComponent(window.location.href) : ""
                 }&origin=${
                   typeof window !== "undefined" ? encodeURIComponent(window.location.origin) : ""
@@ -89,10 +155,10 @@ const NetflixHero: React.FC<NetflixHeroProps> = ({
                 className={`w-full h-full object-cover pointer-events-none select-none transition-opacity duration-700 ${
                   videoLoaded ? "opacity-100" : "opacity-95"
                 }`}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
                 referrerPolicy="strict-origin-when-cross-origin"
                 loading="eager"
-                onLoad={() => setVideoLoaded(true)}
+                onLoad={handleIframeLoad}
               />
             </div>
             {/* Left blend gradient */}
@@ -195,9 +261,32 @@ const NetflixHero: React.FC<NetflixHeroProps> = ({
         </div>
       </div>
 
-      {/* Right Controls: Maturity Rating Border Tag */}
-      <div className="absolute right-0 bottom-24 sm:bottom-32 md:bottom-40 z-20 flex items-center space-x-3 pr-4 sm:pr-8 md:pr-12">
-        <div className="bg-black/60 border-l-4 border-[#E50914] py-1.5 px-4 text-xs sm:text-sm font-black text-neutral-200 backdrop-blur-xs">
+      {/* Right Controls: Sound Always-On Toggle & Maturity Rating Tag */}
+      <div className="absolute right-0 bottom-24 sm:bottom-32 md:bottom-40 z-20 flex items-center space-x-2 sm:space-x-3 pr-4 sm:pr-8 md:pr-12">
+        <button
+          id="hero-sound-toggle-btn"
+          data-tv-focusable="true"
+          tabIndex={0}
+          onClick={handleToggleSound}
+          className={`p-2.5 sm:p-3 rounded-full border-2 transition-all duration-200 cursor-pointer focus:ring-4 focus:ring-amber-400 focus:scale-110 outline-none flex items-center space-x-1.5 backdrop-blur-md shadow-lg ${
+            !isMuted
+              ? "border-emerald-400/80 bg-black/75 text-emerald-400 hover:border-emerald-300"
+              : "border-white/40 bg-black/60 text-white/80 hover:border-white hover:text-white"
+          }`}
+          title={isMuted ? "Click to Turn Sound ON (Always Sound)" : "Sound is ON (Click to Mute)"}
+          aria-label={isMuted ? "Turn Sound ON" : "Mute Sound"}
+        >
+          {!isMuted ? (
+            <Volume2 className="w-5 h-5 text-[#46d369] animate-pulse" />
+          ) : (
+            <VolumeX className="w-5 h-5 text-red-400" />
+          )}
+          <span className="text-xs font-black tracking-wide hidden sm:inline-block">
+            {!isMuted ? "SOUND ON 🔊" : "SOUND OFF"}
+          </span>
+        </button>
+
+        <div className="bg-black/60 border-l-4 border-[#E50914] py-1.5 px-3.5 sm:px-4 text-xs sm:text-sm font-black text-neutral-200 backdrop-blur-xs">
           {media.maturityRating || "16+"}
         </div>
       </div>

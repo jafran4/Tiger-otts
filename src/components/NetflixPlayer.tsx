@@ -25,7 +25,15 @@ interface NetflixPlayerProps {
 const NetflixPlayer: React.FC<NetflixPlayerProps> = ({ media, onClose }) => {
   const [trailerKey, setTrailerKey] = useState<string | null>(null);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState<boolean>(() => {
+    try {
+      const pref = localStorage.getItem("netflix_sound_preference");
+      return pref === "muted"; // Default is unmuted (Always Sound ON)
+    } catch {
+      return false;
+    }
+  });
+  const [volume, setVolume] = useState<number>(100);
   const [progress, setProgress] = useState(15); // Percentage
   const [currentTime, setCurrentTime] = useState(120); // Seconds
   const [totalDuration, setTotalDuration] = useState(7200); // 2 hours
@@ -34,11 +42,71 @@ const NetflixPlayer: React.FC<NetflixPlayerProps> = ({ media, onClose }) => {
   const [speed, setSpeed] = useState<number>(1);
   const [showSpeedMenu, setShowSpeedMenu] = useState(false);
   const [showAudioMenu, setShowAudioMenu] = useState(false);
-  const [audioLang, setAudioLang] = useState("English [Original] (Dolby 5.1)");
+  const [audioLang, setAudioLang] = useState("English [Original] (Dolby Atmos 5.1)");
   const [subtitles, setSubtitles] = useState("English [CC]");
   const containerRef = useRef<HTMLDivElement>(null);
   const controlsTimeoutRef = useRef<any>(null);
   const playBtnRef = useRef<HTMLButtonElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
+
+  const sendIframeCommand = (func: string, args: any = "") => {
+    try {
+      if (iframeRef.current && iframeRef.current.contentWindow) {
+        iframeRef.current.contentWindow.postMessage(
+          JSON.stringify({ event: "command", func, args }),
+          "*"
+        );
+      }
+    } catch {}
+  };
+
+  const toggleMute = () => {
+    const nextMuted = !isMuted;
+    setIsMuted(nextMuted);
+    try {
+      localStorage.setItem("netflix_sound_preference", nextMuted ? "muted" : "unmuted");
+      window.dispatchEvent(
+        new CustomEvent("netflix_sound_change", { detail: { isMuted: nextMuted } })
+      );
+    } catch {}
+
+    if (nextMuted) {
+      sendIframeCommand("mute");
+    } else {
+      sendIframeCommand("unMute");
+      sendIframeCommand("setVolume", [volume]);
+    }
+  };
+
+  const togglePlay = () => {
+    const nextPlay = !isPlaying;
+    setIsPlaying(nextPlay);
+    if (nextPlay) {
+      sendIframeCommand("playVideo");
+      if (!isMuted) {
+        sendIframeCommand("unMute");
+        sendIframeCommand("setVolume", [volume]);
+      }
+    } else {
+      sendIframeCommand("pauseVideo");
+    }
+  };
+
+  useEffect(() => {
+    const handleSoundPref = (e: any) => {
+      const muted =
+        e.detail?.isMuted ?? (localStorage.getItem("netflix_sound_preference") === "muted");
+      setIsMuted(muted);
+      if (muted) {
+        sendIframeCommand("mute");
+      } else {
+        sendIframeCommand("unMute");
+        sendIframeCommand("setVolume", [volume]);
+      }
+    };
+    window.addEventListener("netflix_sound_change", handleSoundPref);
+    return () => window.removeEventListener("netflix_sound_change", handleSoundPref);
+  }, [volume]);
 
   useEffect(() => {
     // Fetch trailer key
@@ -76,7 +144,7 @@ const NetflixPlayer: React.FC<NetflixPlayerProps> = ({ media, onClose }) => {
       if (e.key === " " || e.key === "Enter" || e.keyCode === 13) {
         // Toggle play/pause if no submenu is open
         if (!showSpeedMenu && !showAudioMenu) {
-          setIsPlaying((p) => !p);
+          togglePlay();
           wakeControls();
         }
       }
@@ -88,6 +156,7 @@ const NetflixPlayer: React.FC<NetflixPlayerProps> = ({ media, onClose }) => {
           setProgress((next / totalDuration) * 100);
           return next;
         });
+        sendIframeCommand("seekTo", [Math.min(totalDuration, currentTime + 10), true]);
         wakeControls();
       }
 
@@ -98,15 +167,33 @@ const NetflixPlayer: React.FC<NetflixPlayerProps> = ({ media, onClose }) => {
           setProgress((next / totalDuration) * 100);
           return next;
         });
+        sendIframeCommand("seekTo", [Math.max(0, currentTime - 10), true]);
         wakeControls();
       }
 
-      if (e.key === "ArrowUp" || e.key === "ArrowDown") {
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setVolume((v) => {
+          const next = Math.min(100, v + 10);
+          sendIframeCommand("setVolume", [next]);
+          if (isMuted) toggleMute();
+          return next;
+        });
+        wakeControls();
+      }
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setVolume((v) => {
+          const next = Math.max(0, v - 10);
+          sendIframeCommand("setVolume", [next]);
+          return next;
+        });
         wakeControls();
       }
 
       if (e.key.toLowerCase() === "m") {
-        setIsMuted((m) => !m);
+        toggleMute();
         wakeControls();
       }
 
@@ -125,7 +212,17 @@ const NetflixPlayer: React.FC<NetflixPlayerProps> = ({ media, onClose }) => {
       window.removeEventListener("keydown", handleKeyDown);
       clearTimeout(introTimer);
     };
-  }, [media, onClose, totalDuration, showSpeedMenu, showAudioMenu]);
+  }, [media, onClose, totalDuration, showSpeedMenu, showAudioMenu, isPlaying, isMuted, volume, currentTime]);
+
+  const handleIframeLoad = () => {
+    if (!isMuted) {
+      setTimeout(() => {
+        sendIframeCommand("unMute");
+        sendIframeCommand("setVolume", [volume]);
+        sendIframeCommand("playVideo");
+      }, 400);
+    }
+  };
 
   // Handle auto-hide controls on TV idle
   const wakeControls = () => {
@@ -178,14 +275,16 @@ const NetflixPlayer: React.FC<NetflixPlayerProps> = ({ media, onClose }) => {
       <div className="absolute inset-0 w-full h-full pointer-events-none">
         {trailerKey && (
           <iframe
+            ref={iframeRef}
             src={`https://www.youtube-nocookie.com/embed/${trailerKey}?autoplay=1&mute=${
               isMuted ? 1 : 0
-            }&playsinline=1&controls=0&rel=0&modestbranding=1&enablejsapi=1&iv_load_policy=3&origin=${
+            }&playsinline=1&controls=0&rel=0&modestbranding=1&enablejsapi=1&iv_load_policy=3&disablekb=1&origin=${
               typeof window !== "undefined" ? encodeURIComponent(window.location.origin) : ""
             }`}
             title="Video Player"
             className="w-full h-full object-cover scale-105"
-            allow="autoplay; encrypted-media; fullscreen"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+            onLoad={handleIframeLoad}
           />
         )}
       </div>
@@ -215,6 +314,10 @@ const NetflixPlayer: React.FC<NetflixPlayerProps> = ({ media, onClose }) => {
               <span>Dolby Atmos 5.1</span>
               <span>•</span>
               <span>{media.maturityRating || "16+"}</span>
+              <span>•</span>
+              <span className="text-emerald-400 font-bold hidden sm:inline-block">
+                {!isMuted ? "🔊 Sound Active" : "🔇 Muted"}
+              </span>
             </div>
           </div>
         </div>
@@ -222,7 +325,7 @@ const NetflixPlayer: React.FC<NetflixPlayerProps> = ({ media, onClose }) => {
         {/* TV Remote Tip indicator */}
         <div className="hidden md:flex items-center space-x-2 bg-black/60 border border-white/20 px-3 py-1.5 rounded-xl text-xs text-neutral-300">
           <Tv className="w-4 h-4 text-amber-400" />
-          <span>Remote: ⬅️ ➡️ Seek • OK Play/Pause • BACK Exit</span>
+          <span>Remote: ⬅️ ➡️ Seek • ⬆️ ⬇️ Volume • OK Play/Pause • BACK Exit</span>
         </div>
       </div>
 
@@ -265,11 +368,11 @@ const NetflixPlayer: React.FC<NetflixPlayerProps> = ({ media, onClose }) => {
         {/* Player Controls Row */}
         <div className="flex items-center justify-between">
           {/* Left Controls: Play, Rewind 10s, Forward 10s, Volume, Time */}
-          <div className="flex items-center space-x-3 sm:space-x-6">
+          <div className="flex items-center space-x-3 sm:space-x-5">
             {/* Play / Pause Toggle */}
             <button
               ref={playBtnRef}
-              onClick={() => setIsPlaying(!isPlaying)}
+              onClick={togglePlay}
               className="p-2 sm:p-2.5 rounded-full hover:bg-white/20 text-white transition focus:ring-4 focus:ring-amber-400 outline-none cursor-pointer"
               title={isPlaying ? "Pause (Space/OK)" : "Play (Space/OK)"}
             >
@@ -285,6 +388,7 @@ const NetflixPlayer: React.FC<NetflixPlayerProps> = ({ media, onClose }) => {
               onClick={() => {
                 setCurrentTime((t) => Math.max(0, t - 10));
                 setProgress(((currentTime - 10) / totalDuration) * 100);
+                sendIframeCommand("seekTo", [Math.max(0, currentTime - 10), true]);
               }}
               className="p-2 rounded-full hover:bg-white/20 text-white transition focus:ring-4 focus:ring-amber-400 outline-none cursor-pointer"
               title="Rewind 10 seconds (Left Arrow)"
@@ -297,6 +401,7 @@ const NetflixPlayer: React.FC<NetflixPlayerProps> = ({ media, onClose }) => {
               onClick={() => {
                 setCurrentTime((t) => Math.min(totalDuration, t + 10));
                 setProgress(((currentTime + 10) / totalDuration) * 100);
+                sendIframeCommand("seekTo", [Math.min(totalDuration, currentTime + 10), true]);
               }}
               className="p-2 rounded-full hover:bg-white/20 text-white transition focus:ring-4 focus:ring-amber-400 outline-none cursor-pointer"
               title="Forward 10 seconds (Right Arrow)"
@@ -304,21 +409,45 @@ const NetflixPlayer: React.FC<NetflixPlayerProps> = ({ media, onClose }) => {
               <RotateCw className="w-5 h-5 sm:w-6 sm:h-6" />
             </button>
 
-            {/* Volume Toggle */}
-            <button
-              onClick={() => setIsMuted(!isMuted)}
-              className="p-2 rounded-full hover:bg-white/20 text-white transition focus:ring-4 focus:ring-amber-400 outline-none cursor-pointer"
-              title={isMuted ? "Unmute (M)" : "Mute (M)"}
-            >
-              {isMuted ? (
-                <VolumeX className="w-5 h-5 sm:w-6 sm:h-6" />
-              ) : (
-                <Volume2 className="w-5 h-5 sm:w-6 sm:h-6" />
-              )}
-            </button>
+            {/* Sound & Volume Control Group */}
+            <div className="flex items-center space-x-2 group/volume relative">
+              <button
+                onClick={toggleMute}
+                className="p-2 rounded-full hover:bg-white/20 text-white transition focus:ring-4 focus:ring-amber-400 outline-none cursor-pointer"
+                title={isMuted ? "Click to Turn Sound ON (M)" : `Sound ON ${volume}% (Click to Mute)`}
+              >
+                {isMuted ? (
+                  <VolumeX className="w-5 h-5 sm:w-6 sm:h-6 text-red-400" />
+                ) : (
+                  <Volume2 className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-400" />
+                )}
+              </button>
+
+              {/* Volume Slider */}
+              <div className="hidden sm:flex items-center space-x-2">
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={isMuted ? 0 : volume}
+                  onChange={(e) => {
+                    const newVol = Number(e.target.value);
+                    setVolume(newVol);
+                    if (isMuted && newVol > 0) setIsMuted(false);
+                    sendIframeCommand("setVolume", [newVol]);
+                    if (newVol > 0) sendIframeCommand("unMute");
+                  }}
+                  className="w-16 sm:w-20 md:w-24 h-1.5 bg-neutral-600 rounded-lg appearance-none cursor-pointer accent-[#E50914]"
+                  title={`Volume: ${isMuted ? 0 : volume}%`}
+                />
+                <span className="text-[11px] font-mono text-neutral-300 min-w-[28px]">
+                  {isMuted ? "0%" : `${volume}%`}
+                </span>
+              </div>
+            </div>
 
             {/* Time Stamp Display */}
-            <div className="text-xs sm:text-sm font-semibold text-neutral-300">
+            <div className="text-xs sm:text-sm font-semibold text-neutral-300 hidden sm:block">
               <span>{formatTime(currentTime)}</span>
               <span className="mx-1 text-neutral-500">/</span>
               <span>{formatTime(totalDuration)}</span>
