@@ -127,7 +127,7 @@ const NetflixHero: React.FC<NetflixHeroProps> = ({
   return (
     <section
       id="netflix-billboard-hero"
-      className="relative w-full h-[70vh] sm:h-[80vh] md:h-[88vh] lg:h-[94vh] bg-[#141414] overflow-hidden select-none"
+      className="relative w-full h-[78vh] sm:h-[82vh] md:h-[88vh] lg:h-[94vh] bg-[#141414] overflow-hidden select-none"
     >
       {/* Background Image / Video Player */}
       <div className="absolute inset-0 w-full h-full">
@@ -176,62 +176,59 @@ const NetflixHero: React.FC<NetflixHeroProps> = ({
       </div>
 
       {/* Hero Content Container with TV Overscan Safe Area */}
-      <div className="relative z-20 h-full flex flex-col justify-end pb-16 sm:pb-24 md:pb-32 px-4 sm:px-8 md:px-12 lg:px-16 max-w-4xl">
+      <div className="relative z-20 h-full flex flex-col justify-end pb-8 sm:pb-14 md:pb-18 lg:pb-20 px-4 sm:px-8 md:px-12 lg:px-16 max-w-4xl">
         {/* Title */}
-        <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white tracking-tight leading-tight mb-3 sm:mb-4 drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)]">
+        <h1 className="text-2xl sm:text-4xl md:text-6xl lg:text-7xl font-black text-white tracking-tight leading-tight mb-2 sm:mb-4 drop-shadow-[0_4px_16px_rgba(0,0,0,0.9)] max-w-xl">
           {media.title || media.name}
         </h1>
 
         {/* Badges: Top 10, Match, Year, Maturity, 4K UHD, Audio */}
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3.5 text-xs sm:text-sm">
-          <div className="flex items-center space-x-1.5 bg-[#E50914] text-white px-2.5 py-0.5 rounded font-black text-[11px] uppercase tracking-wider shadow-md">
+        <div className="flex flex-wrap items-center gap-1.5 sm:gap-3 mb-2.5 sm:mb-3.5 text-xs sm:text-sm">
+          <div className="flex items-center space-x-1 bg-[#E50914] text-white px-2 py-0.5 rounded font-black text-[10px] sm:text-[11px] uppercase tracking-wider shadow-md">
             <span>TOP 10</span>
           </div>
-          <span className="font-extrabold text-white text-xs sm:text-sm">
-            #1 in {media.media_type === "tv" ? "TV Series" : "Movies"} Today
+          <span className="font-extrabold text-white text-[11px] sm:text-sm">
+            #1 in {media.media_type === "tv" ? "TV" : "Movies"} Today
           </span>
-          <span className="text-[#46d369] font-bold text-xs sm:text-sm">
+          <span className="text-[#46d369] font-bold text-[11px] sm:text-sm">
             {media.matchScore || 98}% Match
           </span>
-          <span className="text-neutral-300 font-semibold">{releaseYear}</span>
-          <span className="px-1.5 py-0.5 border border-neutral-500 rounded text-[10px] sm:text-xs text-neutral-200 font-bold">
+          <span className="text-neutral-300 font-semibold text-[11px] sm:text-xs">{releaseYear}</span>
+          <span className="px-1.5 py-0.5 border border-neutral-500 rounded text-[9px] sm:text-xs text-neutral-200 font-bold">
             {media.maturityRating || "PG-13"}
           </span>
-          <span className="px-1.5 py-0.5 border border-amber-400/80 text-amber-400 rounded text-[10px] sm:text-xs font-black">
-            4K ULTRA HD
-          </span>
-          <span className="px-1.5 py-0.5 border border-neutral-600 rounded text-[10px] text-neutral-300 font-bold hidden sm:inline-block">
-            5.1 ATMOS
+          <span className="px-1.5 py-0.5 border border-amber-400/80 text-amber-400 rounded text-[9px] sm:text-xs font-black">
+            4K UHD
           </span>
 
           {onOpenStore && (
             <button
               data-tv-focusable="true"
               onClick={onOpenStore}
-              className="flex items-center space-x-1.5 px-2.5 py-1 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded-lg text-xs font-bold transition duration-200 cursor-pointer focus:ring-4 focus:ring-amber-400 focus:scale-105 outline-none"
+              className="hidden xs:flex items-center space-x-1 px-2 py-0.5 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 rounded text-[11px] font-bold transition duration-200 cursor-pointer"
             >
-              <Crown className="w-3.5 h-3.5 fill-amber-400 text-amber-400" />
-              <span>Get 4K Account ($2.99)</span>
+              <Crown className="w-3 h-3 fill-amber-400 text-amber-400" />
+              <span>4K Account Pass</span>
             </button>
           )}
         </div>
 
         {/* Synopsis / Description */}
-        <p className="text-xs sm:text-sm md:text-base text-neutral-200 line-clamp-3 leading-relaxed mb-6 drop-shadow-md max-w-2xl">
+        <p className="text-xs sm:text-sm md:text-base text-neutral-100 sm:text-neutral-200 line-clamp-2 sm:line-clamp-3 leading-relaxed mb-4 sm:mb-6 max-w-2xl drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)] pr-0 sm:pr-2">
           {media.overview}
         </p>
 
         {/* Primary Action Buttons (TV D-Pad Focusable) */}
-        <div className="flex items-center space-x-3 sm:space-x-4">
+        <div className="flex items-center space-x-2 sm:space-x-4">
           {/* Watch Now / Play Button */}
           <button
             id="hero-play-btn"
             data-tv-focusable="true"
             tabIndex={0}
             onClick={() => onPlay(media)}
-            className="flex items-center justify-center space-x-2 px-6 sm:px-8 py-3 bg-white hover:bg-neutral-200 text-black font-extrabold text-sm sm:text-base rounded-lg transition-all duration-200 active:scale-95 cursor-pointer shadow-xl focus:ring-4 focus:ring-amber-400 focus:scale-110 focus:shadow-[0_0_25px_rgba(245,158,11,0.9)] outline-none"
+            className="flex-1 sm:flex-none flex items-center justify-center space-x-2 px-5 sm:px-8 py-2.5 sm:py-3 bg-white hover:bg-neutral-200 text-black font-extrabold text-xs sm:text-base rounded-lg transition-all duration-200 active:scale-95 cursor-pointer shadow-xl focus:ring-4 focus:ring-amber-400 focus:scale-110 focus:shadow-[0_0_25px_rgba(245,158,11,0.9)] outline-none min-h-[42px]"
           >
-            <Play className="w-5 h-5 sm:w-6 sm:h-6 fill-black text-black" />
+            <Play className="w-4 h-4 sm:w-6 sm:h-6 fill-black text-black" />
             <span>Watch Now</span>
           </button>
 
@@ -241,9 +238,9 @@ const NetflixHero: React.FC<NetflixHeroProps> = ({
             data-tv-focusable="true"
             tabIndex={0}
             onClick={() => onOpenDetail(media)}
-            className="flex items-center justify-center space-x-2 px-6 sm:px-8 py-3 bg-neutral-800/80 hover:bg-neutral-700 text-white font-bold text-sm sm:text-base rounded-lg backdrop-blur-sm transition-all duration-200 active:scale-95 cursor-pointer shadow-lg border border-white/20 focus:ring-4 focus:ring-amber-400 focus:scale-110 outline-none"
+            className="flex-1 sm:flex-none flex items-center justify-center space-x-1.5 sm:space-x-2 px-4 sm:px-8 py-2.5 sm:py-3 bg-neutral-800/85 hover:bg-neutral-700 text-white font-bold text-xs sm:text-base rounded-lg backdrop-blur-sm transition-all duration-200 active:scale-95 cursor-pointer shadow-lg border border-white/20 focus:ring-4 focus:ring-amber-400 focus:scale-110 outline-none min-h-[42px]"
           >
-            <Info className="w-5 h-5 sm:w-6 sm:h-6" />
+            <Info className="w-4 h-4 sm:w-6 sm:h-6" />
             <span>More Info</span>
           </button>
 
@@ -252,23 +249,23 @@ const NetflixHero: React.FC<NetflixHeroProps> = ({
             data-tv-focusable="true"
             tabIndex={0}
             onClick={() => onToggleMyList(media)}
-            className="flex items-center justify-center p-3 rounded-full border border-white/40 hover:border-white text-white hover:bg-white/10 transition backdrop-blur-sm cursor-pointer focus:ring-4 focus:ring-amber-400 focus:scale-110 outline-none"
+            className="flex items-center justify-center w-10 h-10 sm:w-12 sm:h-12 rounded-full border border-white/40 hover:border-white text-white hover:bg-white/10 transition backdrop-blur-sm cursor-pointer focus:ring-4 focus:ring-amber-400 focus:scale-110 outline-none flex-shrink-0"
             title={isInMyList ? "Remove from My List" : "Add to My List"}
             aria-label={isInMyList ? "Remove from My List" : "Add to My List"}
           >
-            {isInMyList ? <Check className="w-5 h-5 text-[#46d369]" /> : <Plus className="w-5 h-5" />}
+            {isInMyList ? <Check className="w-4 h-4 sm:w-5 sm:h-5 text-[#46d369]" /> : <Plus className="w-4 h-4 sm:w-5 sm:h-5" />}
           </button>
         </div>
       </div>
 
       {/* Right Controls: Sound Always-On Toggle & Maturity Rating Tag */}
-      <div className="absolute right-0 bottom-24 sm:bottom-32 md:bottom-40 z-20 flex items-center space-x-2 sm:space-x-3 pr-4 sm:pr-8 md:pr-12">
+      <div className="absolute right-0 top-20 sm:top-auto sm:bottom-40 md:bottom-48 z-20 flex items-center space-x-1.5 sm:space-x-3 pr-3 sm:pr-8 md:pr-12">
         <button
           id="hero-sound-toggle-btn"
           data-tv-focusable="true"
           tabIndex={0}
           onClick={handleToggleSound}
-          className={`p-2.5 sm:p-3 rounded-full border-2 transition-all duration-200 cursor-pointer focus:ring-4 focus:ring-amber-400 focus:scale-110 outline-none flex items-center justify-center backdrop-blur-md shadow-lg ${
+          className={`p-2 sm:p-3 rounded-full border transition-all duration-200 cursor-pointer focus:ring-4 focus:ring-amber-400 focus:scale-110 outline-none flex items-center justify-center backdrop-blur-md shadow-lg ${
             !isMuted
               ? "border-emerald-400/80 bg-black/75 text-emerald-400 hover:border-emerald-300"
               : "border-white/40 bg-black/60 text-white/80 hover:border-white hover:text-white"
@@ -277,13 +274,13 @@ const NetflixHero: React.FC<NetflixHeroProps> = ({
           aria-label={isMuted ? "Turn Sound ON" : "Mute Sound"}
         >
           {!isMuted ? (
-            <Volume2 className="w-5 h-5 text-[#46d369]" />
+            <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 text-[#46d369]" />
           ) : (
-            <VolumeX className="w-5 h-5 text-neutral-300" />
+            <VolumeX className="w-4 h-4 sm:w-5 sm:h-5 text-neutral-300" />
           )}
         </button>
 
-        <div className="bg-black/60 border-l-4 border-[#E50914] py-1.5 px-3.5 sm:px-4 text-xs sm:text-sm font-black text-neutral-200 backdrop-blur-xs">
+        <div className="bg-black/60 border-l-2 sm:border-l-4 border-[#E50914] py-1 px-2.5 sm:px-4 text-[11px] sm:text-sm font-black text-neutral-200 backdrop-blur-xs rounded-l-sm">
           {media.maturityRating || "16+"}
         </div>
       </div>

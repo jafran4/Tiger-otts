@@ -313,7 +313,7 @@ const TigerSubscriptionSection: React.FC<TigerSubscriptionSectionProps> = ({
           </div>
 
           {/* Plans Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 lg:gap-6 items-stretch">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-5 lg:gap-6 items-stretch">
             {visiblePlans.map((plan) => {
               const isSelected = selectedPlanId === plan.id;
               const price =
@@ -331,53 +331,53 @@ const TigerSubscriptionSection: React.FC<TigerSubscriptionSectionProps> = ({
                 <div
                   key={plan.id}
                   onClick={() => setSelectedPlanId(plan.id)}
-                  className={`rounded-xl p-6 sm:p-7 flex flex-col justify-between transition-colors cursor-pointer ${
+                  className={`rounded-xl p-3.5 sm:p-6 sm:p-7 flex flex-col justify-between transition-colors cursor-pointer ${
                     plan.recommended
-                      ? "bg-[#18181c]"
+                      ? "bg-[#18181c] ring-1 ring-amber-400/30 sm:ring-0"
                       : "bg-[#141416] hover:bg-[#18181c]"
                   }`}
                 >
                   <div>
                     {/* Top Meta */}
-                    <div className="flex items-center justify-between gap-2 mb-3">
-                      <span className="text-xs font-medium text-neutral-400 uppercase tracking-wider">
+                    <div className="flex flex-wrap items-center justify-between gap-1 sm:gap-2 mb-2 sm:mb-3">
+                      <span className="text-[10px] sm:text-xs font-medium text-neutral-400 uppercase tracking-wider truncate">
                         {plan.tierBadge}
                       </span>
-                      <span className="text-[11px] font-semibold text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded">
+                      <span className="text-[9px] sm:text-[11px] font-semibold text-emerald-400 bg-emerald-950/40 px-1.5 sm:px-2 py-0.5 rounded">
                         {plan.discount}
                       </span>
                     </div>
 
                     {/* Plan Name & Period */}
-                    <h3 className="text-xl font-bold text-white mb-0.5">
+                    <h3 className="text-sm sm:text-xl font-bold text-white mb-0.5 line-clamp-1">
                       {plan.name}
                     </h3>
-                    <p className="text-xs text-neutral-400 mb-4">{plan.period}</p>
+                    <p className="text-[10px] sm:text-xs text-neutral-400 mb-2 sm:mb-4">{plan.period}</p>
 
                     {/* Pricing */}
-                    <div className="mb-4">
-                      <div className="flex items-baseline gap-2">
-                        <span className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                    <div className="mb-2.5 sm:mb-4">
+                      <div className="flex flex-wrap items-baseline gap-1 sm:gap-2">
+                        <span className="text-xl sm:text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
                           {price}
                         </span>
-                        <span className="text-xs text-neutral-500 line-through">
+                        <span className="text-[10px] sm:text-xs text-neutral-500 line-through">
                           {originalPrice}
                         </span>
                       </div>
-                      <p className="text-xs font-medium text-neutral-400 mt-0.5">
+                      <p className="text-[10px] sm:text-xs font-medium text-neutral-400 mt-0.5">
                         {monthlyRate}
                       </p>
                     </div>
 
                     {/* Divider */}
-                    <div className="h-px bg-neutral-800/80 my-4" />
+                    <div className="h-px bg-neutral-800/80 my-2.5 sm:my-4" />
 
                     {/* Features List */}
-                    <ul className="space-y-2.5 mb-6">
+                    <ul className="space-y-1.5 sm:space-y-2.5 mb-4 sm:mb-6">
                       {plan.features.map((feature, i) => (
-                        <li key={i} className="flex items-start gap-2.5 text-xs sm:text-sm text-neutral-300">
-                          <Check className="w-4 h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
-                          <span>{feature}</span>
+                        <li key={i} className="flex items-start gap-1.5 sm:gap-2.5 text-[11px] sm:text-xs sm:text-sm text-neutral-300">
+                          <Check className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 flex-shrink-0 mt-0.5" />
+                          <span className="leading-tight">{feature}</span>
                         </li>
                       ))}
                     </ul>
@@ -390,14 +390,14 @@ const TigerSubscriptionSection: React.FC<TigerSubscriptionSectionProps> = ({
                       e.stopPropagation();
                       onSelectPlan(plan.planData, TIGER_OTT_SERVICE);
                     }}
-                    className={`w-full py-3 px-4 rounded-lg text-xs sm:text-sm font-semibold transition-colors cursor-pointer flex items-center justify-center gap-2 ${
+                    className={`w-full py-2 sm:py-3 px-2 sm:px-4 rounded-lg text-[11px] sm:text-xs sm:text-sm font-semibold transition-colors cursor-pointer flex items-center justify-center gap-1 sm:gap-2 ${
                       plan.recommended
                         ? "bg-[#FFE000] text-black hover:bg-[#ebd000]"
                         : "bg-[#25252a] text-white hover:bg-[#303036]"
                     }`}
                   >
                     <span>Select {plan.duration}</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </button>
                 </div>
               );

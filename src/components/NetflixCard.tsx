@@ -69,7 +69,7 @@ const NetflixCard: React.FC<NetflixCardProps> = ({
         </div>
 
         {/* Poster Card */}
-        <div className="relative w-[130px] sm:w-[155px] md:w-[175px] h-[190px] sm:h-[230px] md:h-[260px] rounded-lg overflow-hidden bg-neutral-900 shadow-xl border border-white/10 group-hover:border-white/40 group-focus:border-amber-400 group-focus:ring-4 group-focus:ring-amber-400/80 group-focus:shadow-[0_0_25px_rgba(245,158,11,0.8)] transition-all">
+        <div className="relative w-[115px] sm:w-[155px] md:w-[175px] h-[170px] sm:h-[230px] md:h-[260px] rounded-lg overflow-hidden bg-neutral-900 shadow-xl border border-white/10 group-hover:border-white/40 group-focus:border-amber-400 group-focus:ring-4 group-focus:ring-amber-400/80 group-focus:shadow-[0_0_25px_rgba(245,158,11,0.8)] transition-all">
           <img
             src={posterPath}
             alt={title}
@@ -86,10 +86,10 @@ const NetflixCard: React.FC<NetflixCardProps> = ({
                 e.stopPropagation();
                 onPlay(media);
               }}
-              className="p-3.5 bg-white rounded-full text-black shadow-2xl hover:scale-110 active:scale-95 transition"
+              className="p-3 bg-white rounded-full text-black shadow-2xl hover:scale-110 active:scale-95 transition"
               aria-label="Play"
             >
-              <Play className="w-5 h-5 fill-black" />
+              <Play className="w-4 h-4 sm:w-5 sm:h-5 fill-black" />
             </button>
           </div>
         </div>
@@ -107,7 +107,7 @@ const NetflixCard: React.FC<NetflixCardProps> = ({
       aria-label={`${title}, ${media.matchScore || 96}% Match`}
       onKeyDown={handleKeyDown}
       onClick={() => onOpenDetail(media)}
-      className="group relative flex-shrink-0 w-[160px] sm:w-[210px] md:w-[240px] lg:w-[270px] xl:w-[290px] h-[240px] sm:h-[145px] md:h-[165px] lg:h-[185px] xl:h-[200px] rounded-lg overflow-hidden bg-neutral-900 shadow-lg cursor-pointer transition-all duration-250 select-none border border-white/5 hover:border-white/30 focus:border-amber-400 focus:ring-4 focus:ring-amber-400/90 focus:scale-110 focus:z-40 focus:shadow-[0_0_30px_rgba(245,158,11,0.85)] outline-none"
+      className="group relative flex-shrink-0 w-[140px] sm:w-[210px] md:w-[240px] lg:w-[270px] xl:w-[290px] h-[210px] sm:h-[145px] md:h-[165px] lg:h-[185px] xl:h-[200px] rounded-lg overflow-hidden bg-neutral-900 shadow-lg cursor-pointer transition-all duration-250 select-none border border-white/5 hover:border-white/30 focus:border-amber-400 focus:ring-4 focus:ring-amber-400/90 focus:scale-110 focus:z-40 focus:shadow-[0_0_30px_rgba(245,158,11,0.85)] outline-none active:scale-98"
     >
       {/* Background Poster */}
       <img
