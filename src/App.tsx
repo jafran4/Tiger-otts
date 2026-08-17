@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
+import { Analytics } from "@vercel/analytics/react";
 import NetflixNavbar from "./components/NetflixNavbar";
 import NetflixHero from "./components/NetflixHero";
 import NetflixRow from "./components/NetflixRow";
@@ -711,6 +712,9 @@ const App: React.FC = () => {
           &copy; 1997-2026 Tiger OTT, Inc. Smart TV & Mobile Universal Edition powered by TMDb.
         </p>
       </footer>
+
+      {/* Vercel Web Analytics */}
+      <Analytics />
     </div>
   );
 };
