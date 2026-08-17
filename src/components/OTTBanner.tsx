@@ -1,5 +1,6 @@
 import React from "react";
 import { Sparkles, ShieldCheck, Zap, Crown, ArrowRight, MessageCircle } from "lucide-react";
+import { TigerLogo } from "./TigerLogo";
 
 interface OTTBannerProps {
   onOpenStore: () => void;
@@ -16,6 +17,7 @@ const OTTBanner: React.FC<OTTBannerProps> = ({ onOpenStore, onOpenReseller }) =>
       <div className="absolute inset-0 bg-[radial-gradient(#ffffff22_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none opacity-40" />
 
       <div className="flex items-center space-x-2 sm:space-x-3 z-10 flex-1 min-w-0">
+        <TigerLogo size="sm" className="hidden sm:inline-flex flex-shrink-0" />
         <div className="flex items-center space-x-1.5 px-2 py-0.5 bg-black/40 rounded-full border border-amber-400/40 text-amber-300 text-[11px] font-extrabold uppercase tracking-wider flex-shrink-0">
           <Crown className="w-3.5 h-3.5 fill-amber-400 text-amber-400 animate-pulse" />
           <span>World's #1 OTT Seller</span>

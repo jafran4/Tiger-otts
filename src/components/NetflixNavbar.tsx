@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { ActiveNavTab, UserProfile, NotificationItem, MediaItem } from "../types";
 import { PROFILES, NOTIFICATIONS } from "../data/fallbackData";
+import { TigerLogo } from "./TigerLogo";
 
 interface NetflixNavbarProps {
   activeTab: ActiveNavTab;
@@ -108,12 +109,10 @@ const NetflixNavbar: React.FC<NetflixNavbarProps> = ({
             onClearSearch();
             window.scrollTo({ top: 0, behavior: "smooth" });
           }}
-          className="flex items-center space-x-1.5 focus:outline-none group text-left focus:ring-2 focus:ring-amber-400 rounded-lg p-1"
+          className="flex items-center space-x-2 focus:outline-none group text-left focus:ring-2 focus:ring-amber-400 rounded-lg p-1"
           aria-label="Tiger OTT Home"
         >
-          <span className="text-2xl sm:text-3xl font-black tracking-tighter text-[#E50914] uppercase drop-shadow-[0_2px_10px_rgba(229,9,20,0.5)] group-hover:scale-105 transition-transform duration-200">
-            TIGER OTT
-          </span>
+          <TigerLogo size="sm" className="group-hover:scale-105 transition-transform duration-200" />
           {isTVMode && (
             <span className="hidden sm:inline-block px-1.5 py-0.5 bg-amber-500 text-black font-black text-[9px] rounded uppercase">
               TV MODE

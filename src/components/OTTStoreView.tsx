@@ -24,6 +24,7 @@ import {
   SELLER_GUARANTEES,
 } from "../data/ottData";
 import { OTTService, OTTPlan } from "../types";
+import { TigerLogo } from "./TigerLogo";
 
 interface OTTStoreViewProps {
   onSelectPlanForCheckout: (service: OTTService, plan: OTTPlan) => void;
@@ -56,6 +57,10 @@ const OTTStoreView: React.FC<OTTStoreViewProps> = ({
     <div id="ott-store-main-view" className="w-full max-w-7xl mx-auto px-4 sm:px-8 md:px-12 pt-24 pb-20 animate-fadeIn">
       {/* 👑 Hero Title & Trust Header */}
       <div className="relative text-center mb-12 sm:mb-16 space-y-4">
+        <div className="flex justify-center mb-2">
+          <TigerLogo size="xl" glow className="hover:scale-105 transition-transform duration-300" />
+        </div>
+
         <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 bg-gradient-to-r from-red-600/20 via-amber-500/20 to-red-600/20 border border-amber-400/40 rounded-full text-amber-300 text-xs sm:text-sm font-black uppercase tracking-widest shadow-lg">
           <Crown className="w-4 h-4 text-amber-400 fill-amber-400 animate-bounce" />
           <span>Official Store of World's Number #1 OTT Seller</span>

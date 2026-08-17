@@ -9,6 +9,7 @@ import { TVVirtualKeyboard } from "./components/TVVirtualKeyboard";
 import { TVRemoteHelpModal } from "./components/TVRemoteHelpModal";
 import TigerSubscriptionSection from "./components/TigerSubscriptionSection";
 import OTTCheckoutModal from "./components/OTTCheckoutModal";
+import { TigerLogo } from "./components/TigerLogo";
 import { MediaItem, ActiveNavTab, UserProfile, OTTPlan, OTTService } from "./types";
 import {
   fetchCategoryMedia,
@@ -646,19 +647,23 @@ const App: React.FC = () => {
 
       {/* Netflix / Tiger OTT Footer */}
       <footer className="w-full max-w-6xl mx-auto px-6 sm:px-12 py-12 text-neutral-400 text-xs sm:text-sm border-t border-neutral-800 space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-6 text-white">
-            <a href="#facebook" className="hover:text-[#E50914] transition" aria-label="Facebook">
-              <Facebook className="w-6 h-6" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center space-x-4">
+            <TigerLogo size="md" glow={false} />
+          </div>
+
+          <div className="flex items-center space-x-4 text-white">
+            <a href="#facebook" className="hover:text-[#FFE600] transition" aria-label="Facebook">
+              <Facebook className="w-5 h-5" />
             </a>
-            <a href="#instagram" className="hover:text-[#E50914] transition" aria-label="Instagram">
-              <Instagram className="w-6 h-6" />
+            <a href="#instagram" className="hover:text-[#FFE600] transition" aria-label="Instagram">
+              <Instagram className="w-5 h-5" />
             </a>
-            <a href="#twitter" className="hover:text-[#E50914] transition" aria-label="Twitter">
-              <Twitter className="w-6 h-6" />
+            <a href="#twitter" className="hover:text-[#FFE600] transition" aria-label="Twitter">
+              <Twitter className="w-5 h-5" />
             </a>
-            <a href="#youtube" className="hover:text-[#E50914] transition" aria-label="YouTube">
-              <Youtube className="w-6 h-6" />
+            <a href="#youtube" className="hover:text-[#FFE600] transition" aria-label="YouTube">
+              <Youtube className="w-5 h-5" />
             </a>
           </div>
 
