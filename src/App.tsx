@@ -8,6 +8,7 @@ import NetflixPlayer from "./components/NetflixPlayer";
 import { TVVirtualKeyboard } from "./components/TVVirtualKeyboard";
 import { TVRemoteHelpModal } from "./components/TVRemoteHelpModal";
 import TigerSubscriptionSection from "./components/TigerSubscriptionSection";
+import { TigerSEOSection } from "./components/TigerSEOSection";
 import OTTCheckoutModal from "./components/OTTCheckoutModal";
 import { TigerLogo } from "./components/TigerLogo";
 import { MediaItem, ActiveNavTab, UserProfile, OTTPlan, OTTService } from "./types";
@@ -644,6 +645,9 @@ const App: React.FC = () => {
           onToggleTVMode={() => setIsTVMode(!isTVMode)}
         />
       )}
+
+      {/* SEO & IPTV Service Provider FAQ Section */}
+      <TigerSEOSection onOpenStore={() => handleSelectTab("ott_store")} />
 
       {/* Netflix / Tiger OTT Footer */}
       <footer className="w-full max-w-6xl mx-auto px-6 sm:px-12 py-12 text-neutral-400 text-xs sm:text-sm border-t border-neutral-800 space-y-6">

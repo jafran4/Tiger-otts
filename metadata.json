@@ -1,6 +1,6 @@
 {
   "name": "Tiger OTT",
-  "description": "Tiger OTT - Premium streaming discovery platform featuring a cinematic home screen with billboard hero, Top 10 rankings, personalized watchlist, and high-definition video previews.",
+  "description": "Tiger OTT - The world's cheapest IPTV service provider. Stream 20,000+ live channels, sports, and 60,000+ VOD 4K movies with anti-freeze CDN streaming, top 10 rankings, and instant activation.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

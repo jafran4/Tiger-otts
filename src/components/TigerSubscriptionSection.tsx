@@ -274,15 +274,19 @@ const TigerSubscriptionSection: React.FC<TigerSubscriptionSectionProps> = ({
         <div className="w-full max-w-7xl mx-auto">
           {/* Header Block */}
           <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-10 sm:mb-12">
-            <div className="mb-4">
+            <div className="mb-3">
               <TigerLogo size="lg" glow={false} />
             </div>
 
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FFE000]/10 border border-[#FFE000]/30 text-[#FFE000] text-xs font-bold uppercase tracking-wider mb-3">
+              <span>Cheapest IPTV Service Provider in the World</span>
+            </div>
+
             <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white tracking-tight mb-2.5">
-              Select Your Subscription Plan
+              Select Your 4K IPTV &amp; OTT Subscription Plan
             </h2>
-            <p className="text-neutral-400 text-sm sm:text-base leading-relaxed max-w-xl">
-              Direct account activations in 4K Ultra HD. Choose a duration to proceed to instant checkout.
+            <p className="text-neutral-400 text-xs sm:text-sm md:text-base leading-relaxed max-w-xl">
+              Direct high-speed account activations with 20,000+ live TV channels &amp; 60,000+ movies in 4K UHD. Choose a duration to proceed to instant checkout.
             </p>
 
             {/* Currency Selector */}
